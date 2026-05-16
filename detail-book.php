@@ -32,8 +32,11 @@ $book = mysqli_fetch_assoc($query);
 <div class="col-md-4">
 
 <img
-src="https://placehold.co/400x500"
-class="img-fluid rounded shadow">
+src="<?= !empty($book['gambar'])
+? 'uploads/' . $book['gambar']
+: 'https://placehold.co/300x400'; ?>"
+class="card-img-top"
+style="height:300px; object-fit:cover;">
 
 </div>
 

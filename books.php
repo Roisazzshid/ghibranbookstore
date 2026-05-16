@@ -64,16 +64,18 @@ $query = mysqli_query(
             <div class="card shadow-sm h-100 border-0">
 
                 <img
-                src="https://placehold.co/300x400"
+                src="<?= !empty($book['gambar'])
+                ? 'uploads/' . $book['gambar']
+                : 'https://placehold.co/300x400'; ?>"
                 class="card-img-top"
-                style="height: 320px; object-fit: cover;">
+                style="height:300px; object-fit:cover;">
 
                 <div class="card-body d-flex flex-column">
 
                     <span class="badge bg-primary mb-2">
                         <?= $book['nama_kategori']; ?>
                     </span>
-                    
+
                     <h5 class="fw-bold">
                         <?= $book['judul']; ?>
                     </h5>
