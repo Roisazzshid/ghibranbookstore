@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['admin'])){
+if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
     exit;
 }
@@ -9,23 +9,23 @@ if(!isset($_SESSION['admin'])){
 include '../config/database.php';
 
 /* CREATE */
-if(isset($_POST['add'])){
+if (isset($_POST['add'])) {
 
-    $judul = mysqli_real_escape_string($conn,$_POST['judul']);
-    $penulis = mysqli_real_escape_string($conn,$_POST['penulis']);
+    $judul = mysqli_real_escape_string($conn, $_POST['judul']);
+    $penulis = mysqli_real_escape_string($conn, $_POST['penulis']);
     $harga = $_POST['harga'];
     $stok = $_POST['stok'];
     $kategori = $_POST['kategori'];
-    $deskripsi = mysqli_real_escape_string($conn,$_POST['deskripsi']);
+    $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
 
     // upload gambar
     $gambar = '';
 
-    if(!empty($_FILES['gambar']['name'])){
+    if (!empty($_FILES['gambar']['name'])) {
 
         $gambar =
-        time() . '_' .
-        $_FILES['gambar']['name'];
+            time() . '_' .
+            $_FILES['gambar']['name'];
 
         move_uploaded_file(
             $_FILES['gambar']['tmp_name'],
@@ -59,7 +59,7 @@ if(isset($_POST['add'])){
 }
 
 /* DELETE */
-if(isset($_GET['delete'])){
+if (isset($_GET['delete'])) {
 
     $id = $_GET['delete'];
 
@@ -74,23 +74,23 @@ if(isset($_GET['delete'])){
 }
 
 /* UPDATE */
-if(isset($_POST['update'])){
+if (isset($_POST['update'])) {
 
     $id = $_POST['id'];
 
-    $judul = mysqli_real_escape_string($conn,$_POST['judul']);
-    $penulis = mysqli_real_escape_string($conn,$_POST['penulis']);
+    $judul = mysqli_real_escape_string($conn, $_POST['judul']);
+    $penulis = mysqli_real_escape_string($conn, $_POST['penulis']);
     $kategori = $_POST['kategori'];
     $harga = $_POST['harga'];
     $stok = $_POST['stok'];
-    $deskripsi = mysqli_real_escape_string($conn,$_POST['deskripsi']);
+    $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
 
     // cek upload baru
-    if(!empty($_FILES['gambar']['name'])){
+    if (!empty($_FILES['gambar']['name'])) {
 
         $gambar =
-        time() . '_' .
-        $_FILES['gambar']['name'];
+            time() . '_' .
+            $_FILES['gambar']['name'];
 
         move_uploaded_file(
             $_FILES['gambar']['tmp_name'],
@@ -109,7 +109,6 @@ if(isset($_POST['update'])){
             gambar='$gambar'
             WHERE id='$id'"
         );
-
     } else {
 
         mysqli_query(
@@ -147,405 +146,407 @@ $kategoriQuery = mysqli_query(
 
 $kategoriData = [];
 
-while($kat = mysqli_fetch_assoc($kategoriQuery)){
+while ($kat = mysqli_fetch_assoc($kategoriQuery)) {
     $kategoriData[] = $kat;
 }
 ?>
 
 <!DOCTYPE html>
 <html>
-<head>
-<title>Data Buku</title>
 
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
+<head>
+    <title>Data Buku</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 </head>
 
 <body class="bg-light">
 
-<div class="container py-5">
+    <div class="container py-5">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-<h2 class="fw-bold">
-Data Buku
-</h2>
+            <h2 class="fw-bold">
+                Data Buku
+            </h2>
 
-<div>
+            <div>
 
-<a href="index.php"
-class="btn btn-secondary">
-Dashboard
-</a>
+                <a href="index.php"
+                    class="btn btn-secondary">
+                    Dashboard
+                </a>
 
-<button
-class="btn btn-primary"
-data-bs-toggle="modal"
-data-bs-target="#bookModal">
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#bookModal">
 
-+ Tambah Buku
+                    + Tambah Buku
 
-</button>
+                </button>
 
-</div>
-</div>
+            </div>
+        </div>
 
-<div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0">
 
-<div class="table-responsive">
+            <div class="table-responsive">
 
-<table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0">
 
-<thead class="table-dark">
-<tr>
-<th>ID</th>
-<th>Cover</th>
-<th>Judul</th>
-<th>Penulis</th>
-<th>Kategori</th>
-<th>Harga</th>
-<th>Stok</th>
-<th width="180">Aksi</th>
-</tr>
-</thead>
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Cover</th>
+                            <th>Judul</th>
+                            <th>Penulis</th>
+                            <th>Kategori</th>
+                            <th>Harga</th>
+                            <th>Stok</th>
+                            <th width="180">Aksi</th>
+                        </tr>
+                    </thead>
 
-<tbody>
+                    <tbody>
 
-<?php while($book = mysqli_fetch_assoc($query)) : ?>
+                        <?php while ($book = mysqli_fetch_assoc($query)) : ?>
 
-<tr>
+                            <tr>
 
-<td><?= $book['id'] ?></td>
+                                <td><?= $book['id'] ?></td>
 
-<td>
+                                <td>
 
-<img
-src="<?= !empty($book['gambar'])
-? '../uploads/' . $book['gambar']
-: 'https://placehold.co/80x100'; ?>"
-width="60"
-height="80"
-style="object-fit:cover"
-class="rounded shadow-sm">
+                                    <img
+                                        src="<?= !empty($book['gambar'])
+                                                    ? '../uploads/' . $book['gambar']
+                                                    : 'https://placehold.co/80x100'; ?>"
+                                        width="60"
+                                        height="80"
+                                        style="object-fit:cover"
+                                        class="rounded shadow-sm">
 
-</td>
+                                </td>
 
-<td><?= $book['judul'] ?></td>
-<td><?= $book['penulis'] ?></td>
-<td><?= $book['nama_kategori'] ?></td>
-<td>Rp <?= number_format($book['harga']) ?></td>
-<td><?= $book['stok'] ?></td>
+                                <td><?= $book['judul'] ?></td>
+                                <td><?= $book['penulis'] ?></td>
+                                <td><?= $book['nama_kategori'] ?></td>
+                                <td>Rp <?= number_format($book['harga']) ?></td>
+                                <td><?= $book['stok'] ?></td>
 
-<td>
+                                <td>
 
-<button
-class="btn btn-warning btn-sm"
-data-bs-toggle="modal"
-data-bs-target="#edit<?= $book['id'] ?>">
+                                    <button
+                                        class="btn btn-warning btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#edit<?= $book['id'] ?>">
 
-Edit
+                                        Edit
 
-</button>
+                                    </button>
 
-<a
-href="books.php?delete=<?= $book['id'] ?>"
-class="btn btn-danger btn-sm"
-onclick="return confirm('Hapus buku?')">
+                                    <a
+                                        href="books.php?delete=<?= $book['id'] ?>"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Hapus buku?')">
 
-Delete
+                                        Delete
 
-</a>
+                                    </a>
 
-</td>
+                                </td>
 
-</tr>
+                            </tr>
 
-<!-- Modal Edit -->
-<div class="modal fade"
-id="edit<?= $book['id'] ?>">
+                            <!-- Modal Edit -->
+                            <div class="modal fade"
+                                id="edit<?= $book['id'] ?>">
 
-<div class="modal-dialog modal-lg">
+                                <div class="modal-dialog modal-lg">
 
-<div class="modal-content">
+                                    <div class="modal-content">
 
-<form method="POST"
-enctype="multipart/form-data">
+                                        <form method="POST"
+                                            enctype="multipart/form-data">
 
-<div class="modal-header">
+                                            <div class="modal-header">
 
-<h5>Edit Buku</h5>
+                                                <h5>Edit Buku</h5>
 
-<button
-class="btn-close"
-data-bs-dismiss="modal">
-</button>
+                                                <button
+                                                    class="btn-close"
+                                                    data-bs-dismiss="modal">
+                                                </button>
 
-</div>
+                                            </div>
 
-<div class="modal-body">
+                                            <div class="modal-body">
 
-<input
-type="hidden"
-name="id"
-value="<?= $book['id'] ?>">
+                                                <input
+                                                    type="hidden"
+                                                    name="id"
+                                                    value="<?= $book['id'] ?>">
 
-<div class="row">
+                                                <div class="row">
 
-<div class="col-md-6 mb-3">
-<label>Judul</label>
-<input
-type="text"
-name="judul"
-class="form-control"
-value="<?= $book['judul'] ?>"
-required>
-</div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label>Judul</label>
+                                                        <input
+                                                            type="text"
+                                                            name="judul"
+                                                            class="form-control"
+                                                            value="<?= $book['judul'] ?>"
+                                                            required>
+                                                    </div>
 
-<div class="col-md-6 mb-3">
-<label>Penulis</label>
-<input
-type="text"
-name="penulis"
-class="form-control"
-value="<?= $book['penulis'] ?>"
-required>
-</div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label>Penulis</label>
+                                                        <input
+                                                            type="text"
+                                                            name="penulis"
+                                                            class="form-control"
+                                                            value="<?= $book['penulis'] ?>"
+                                                            required>
+                                                    </div>
 
-<div class="col-md-6 mb-3">
-<label>Kategori</label>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label>Kategori</label>
 
-<select
-name="kategori"
-class="form-control"
-required>
+                                                        <select
+                                                            name="kategori"
+                                                            class="form-control"
+                                                            required>
 
-<?php foreach($kategoriData as $kat) : ?>
+                                                            <?php foreach ($kategoriData as $kat) : ?>
 
-<option
-value="<?= $kat['id'] ?>"
-<?= $kat['id']
-== $book['kategori_id']
-? 'selected' : '' ?>>
+                                                                <option
+                                                                    value="<?= $kat['id'] ?>"
+                                                                    <?= $kat['id']
+                                                                        == $book['kategori_id']
+                                                                        ? 'selected' : '' ?>>
 
-<?= $kat['nama_kategori'] ?>
+                                                                    <?= $kat['nama_kategori'] ?>
 
-</option>
+                                                                </option>
 
-<?php endforeach; ?>
+                                                            <?php endforeach; ?>
 
-</select>
-</div>
+                                                        </select>
+                                                    </div>
 
-<div class="col-md-3 mb-3">
-<label>Harga</label>
-<input
-type="number"
-name="harga"
-class="form-control"
-value="<?= $book['harga'] ?>"
-required>
-</div>
+                                                    <div class="col-md-3 mb-3">
+                                                        <label>Harga</label>
+                                                        <input
+                                                            type="number"
+                                                            name="harga"
+                                                            class="form-control"
+                                                            value="<?= $book['harga'] ?>"
+                                                            required>
+                                                    </div>
 
-<div class="col-md-3 mb-3">
-<label>Stok</label>
-<input
-type="number"
-name="stok"
-class="form-control"
-value="<?= $book['stok'] ?>"
-required>
-</div>
+                                                    <div class="col-md-3 mb-3">
+                                                        <label>Stok</label>
+                                                        <input
+                                                            type="number"
+                                                            name="stok"
+                                                            class="form-control"
+                                                            value="<?= $book['stok'] ?>"
+                                                            required>
+                                                    </div>
 
-<div class="col-12 mb-3">
+                                                    <div class="col-12 mb-3">
 
-<label>Cover Buku</label>
+                                                        <label>Cover Buku</label>
 
-<input
-type="file"
-name="gambar"
-class="form-control">
+                                                        <input
+                                                            type="file"
+                                                            name="gambar"
+                                                            class="form-control">
 
-<?php if(!empty($book['gambar'])) : ?>
+                                                        <?php if (!empty($book['gambar'])) : ?>
 
-<img
-src="../uploads/<?= $book['gambar'] ?>"
-width="100"
-class="mt-2 rounded">
+                                                            <img
+                                                                src="../uploads/<?= $book['gambar'] ?>"
+                                                                width="100"
+                                                                class="mt-2 rounded">
 
-<?php endif; ?>
+                                                        <?php endif; ?>
 
-</div>
+                                                    </div>
 
-<div class="col-12">
-<label>Deskripsi</label>
+                                                    <div class="col-12">
+                                                        <label>Deskripsi</label>
 
-<textarea
-name="deskripsi"
-rows="4"
-class="form-control"><?= $book['deskripsi'] ?></textarea>
-</div>
+                                                        <textarea
+                                                            name="deskripsi"
+                                                            rows="4"
+                                                            class="form-control"><?= $book['deskripsi'] ?></textarea>
+                                                    </div>
 
-</div>
+                                                </div>
 
-</div>
+                                            </div>
 
-<div class="modal-footer">
+                                            <div class="modal-footer">
 
-<button
-type="submit"
-name="update"
-class="btn btn-primary">
+                                                <button
+                                                    type="submit"
+                                                    name="update"
+                                                    class="btn btn-primary">
 
-Update Buku
+                                                    Update Buku
 
-</button>
+                                                </button>
 
-</div>
+                                            </div>
 
-</form>
+                                        </form>
 
-</div>
-</div>
-</div>
+                                    </div>
+                                </div>
+                            </div>
 
-<?php endwhile; ?>
+                        <?php endwhile; ?>
 
-</tbody>
+                    </tbody>
 
-</table>
+                </table>
 
-</div>
-</div>
+            </div>
+        </div>
 
-</div>
+    </div>
 
-<!-- Modal Tambah -->
-<div class="modal fade"
-id="bookModal">
+    <!-- Modal Tambah -->
+    <div class="modal fade"
+        id="bookModal">
 
-<div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg">
 
-<div class="modal-content">
+            <div class="modal-content">
 
-<form method="POST"
-enctype="multipart/form-data">
+                <form method="POST"
+                    enctype="multipart/form-data">
 
-<div class="modal-header">
+                    <div class="modal-header">
 
-<h5>Tambah Buku</h5>
+                        <h5>Tambah Buku</h5>
 
-<button
-class="btn-close"
-data-bs-dismiss="modal">
-</button>
+                        <button
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                        </button>
 
-</div>
+                    </div>
 
-<div class="modal-body">
+                    <div class="modal-body">
 
-<div class="row">
+                        <div class="row">
 
-<div class="col-md-6 mb-3">
-<label>Judul</label>
-<input type="text"
-name="judul"
-class="form-control"
-required>
-</div>
+                            <div class="col-md-6 mb-3">
+                                <label>Judul</label>
+                                <input type="text"
+                                    name="judul"
+                                    class="form-control"
+                                    required>
+                            </div>
 
-<div class="col-md-6 mb-3">
-<label>Penulis</label>
-<input type="text"
-name="penulis"
-class="form-control"
-required>
-</div>
+                            <div class="col-md-6 mb-3">
+                                <label>Penulis</label>
+                                <input type="text"
+                                    name="penulis"
+                                    class="form-control"
+                                    required>
+                            </div>
 
-<div class="col-md-6 mb-3">
-<label>Kategori</label>
+                            <div class="col-md-6 mb-3">
+                                <label>Kategori</label>
 
-<select
-name="kategori"
-class="form-control"
-required>
+                                <select
+                                    name="kategori"
+                                    class="form-control"
+                                    required>
 
-<option value="">
-Pilih Kategori
-</option>
+                                    <option value="">
+                                        Pilih Kategori
+                                    </option>
 
-<?php foreach($kategoriData as $kat) : ?>
+                                    <?php foreach ($kategoriData as $kat) : ?>
 
-<option value="<?= $kat['id'] ?>">
-<?= $kat['nama_kategori'] ?>
-</option>
+                                        <option value="<?= $kat['id'] ?>">
+                                            <?= $kat['nama_kategori'] ?>
+                                        </option>
 
-<?php endforeach; ?>
+                                    <?php endforeach; ?>
 
-</select>
-</div>
+                                </select>
+                            </div>
 
-<div class="col-md-3 mb-3">
-<label>Harga</label>
-<input type="number"
-name="harga"
-class="form-control"
-required>
-</div>
+                            <div class="col-md-3 mb-3">
+                                <label>Harga</label>
+                                <input type="number"
+                                    name="harga"
+                                    class="form-control"
+                                    required>
+                            </div>
 
-<div class="col-md-3 mb-3">
-<label>Stok</label>
-<input type="number"
-name="stok"
-class="form-control"
-required>
-</div>
+                            <div class="col-md-3 mb-3">
+                                <label>Stok</label>
+                                <input type="number"
+                                    name="stok"
+                                    class="form-control"
+                                    required>
+                            </div>
 
-<div class="col-12 mb-3">
+                            <div class="col-12 mb-3">
 
-<label>Cover Buku</label>
+                                <label>Cover Buku</label>
 
-<input
-type="file"
-name="gambar"
-class="form-control"
-accept="image/*">
+                                <input
+                                    type="file"
+                                    name="gambar"
+                                    class="form-control"
+                                    accept="image/*">
 
-</div>
+                            </div>
 
-<div class="col-12">
-<label>Deskripsi</label>
+                            <div class="col-12">
+                                <label>Deskripsi</label>
 
-<textarea
-name="deskripsi"
-rows="4"
-class="form-control"></textarea>
-</div>
+                                <textarea
+                                    name="deskripsi"
+                                    rows="4"
+                                    class="form-control"></textarea>
+                            </div>
 
-</div>
+                        </div>
 
-</div>
+                    </div>
 
-<div class="modal-footer">
+                    <div class="modal-footer">
 
-<button
-type="submit"
-name="add"
-class="btn btn-primary">
+                        <button
+                            type="submit"
+                            name="add"
+                            class="btn btn-primary">
 
-Simpan Buku
+                            Simpan Buku
 
-</button>
+                        </button>
 
-</div>
+                    </div>
 
-</form>
+                </form>
 
-</div>
-</div>
-</div>
+            </div>
+        </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

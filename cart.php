@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['user'])){
+if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit;
 }
@@ -9,40 +9,81 @@ if(!isset($_SESSION['user'])){
 include 'config/database.php';
 
 $user_id =
-$_SESSION['user']['id'];
+    $_SESSION['user']['id'];
 
-if(isset($_GET['id'])){
+/* ADD TO CART */
+if (isset($_GET['id'])) {
 
     $book_id = $_GET['id'];
 
+    // cek apakah buku sudah ada di cart
+    $cek = mysqli_query(
+        $conn,
+        "SELECT *
+        FROM cart
+        WHERE user_id='$user_id'
+        AND buku_id='$book_id'"
+    );
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        // update qty kalau sudah ada
+        mysqli_query(
+            $conn,
+            "UPDATE cart
+            SET qty = qty + 1
+            WHERE user_id='$user_id'
+            AND buku_id='$book_id'"
+        );
+    } else {
+
+        // insert baru
+        mysqli_query(
+            $conn,
+            "INSERT INTO cart(
+            user_id,
+            buku_id,
+            qty
+            ) VALUES(
+            '$user_id',
+            '$book_id',
+            1
+            )"
+        );
+    }
+
+    header("Location: cart.php");
+    exit;
+}
+
+/* DELETE ITEM */
+if (isset($_GET['delete'])) {
+
+    $id = $_GET['delete'];
+
     mysqli_query(
         $conn,
-        "INSERT INTO cart(
-        user_id,
-        buku_id,
-        qty
-        ) VALUES(
-        '$user_id',
-        '$book_id',
-        1
-        )"
+        "DELETE FROM cart
+        WHERE id='$id'"
     );
 
     header("Location: cart.php");
     exit;
 }
 
+/* GET CART */
 $query = mysqli_query(
     $conn,
-    "SELECT cart.*,
+    "SELECT
+    cart.id AS cart_id,
+    cart.qty,
     buku.judul,
-    buku.harga
+    buku.harga,
+    buku.gambar
     FROM cart
     JOIN buku
-    ON cart.buku_id =
-    buku.id
-    WHERE cart.user_id=
-    '$user_id'"
+    ON cart.buku_id = buku.id
+    WHERE cart.user_id='$user_id'"
 );
 
 $total = 0;
@@ -53,86 +94,140 @@ $total = 0;
 
 <div class="container py-5">
 
-<h2 class="mb-4">
-Keranjang Saya
-</h2>
+    <h2 class="fw-bold mb-4">
+        🛒 Keranjang Saya
+    </h2>
 
-<div class="card shadow-sm">
+    <div class="card shadow-sm border-0">
 
-<table class="table">
+        <div class="table-responsive">
 
-<thead>
-<tr>
-<th>Buku</th>
-<th>Harga</th>
-<th>Qty</th>
-<th>Subtotal</th>
-</tr>
-</thead>
+            <table class="table align-middle mb-0">
 
-<tbody>
+                <thead class="table-dark">
 
-<?php while($cart =
-mysqli_fetch_assoc($query)) :
+                    <tr>
+                        <th>Cover</th>
+                        <th>Buku</th>
+                        <th>Harga</th>
+                        <th>Qty</th>
+                        <th>Subtotal</th>
+                        <th>Aksi</th>
+                    </tr>
 
-$subtotal =
-$cart['harga']
-*
-$cart['qty'];
+                </thead>
 
-$total += $subtotal;
-?>
+                <tbody>
 
-<tr>
+                    <?php while ($cart =
+                        mysqli_fetch_assoc($query)
+                    ) :
 
-<td>
-<?= $cart['judul']; ?>
-</td>
+                        $subtotal =
+                            $cart['harga']
+                            *
+                            $cart['qty'];
 
-<td>
-Rp <?= number_format(
-$cart['harga']
-); ?>
-</td>
+                        $total += $subtotal;
+                    ?>
 
-<td>
-<?= $cart['qty']; ?>
-</td>
+                        <tr>
 
-<td>
-Rp <?= number_format(
-$subtotal
-); ?>
-</td>
+                            <td width="100">
 
-</tr>
+                                <img
+                                    src="<?= !empty($cart['gambar'])
+                                                ? 'uploads/' .
+                                                $cart['gambar']
+                                                : 'https://placehold.co/80x100'; ?>"
+                                    width="60"
+                                    height="80"
+                                    style="object-fit:cover"
+                                    class="rounded shadow-sm">
 
-<?php endwhile; ?>
+                            </td>
 
-</tbody>
+                            <td>
 
-</table>
+                                <?= $cart['judul']; ?>
 
-</div>
+                            </td>
 
-<div class="text-end mt-4">
+                            <td>
 
-<h3>
-Total:
-Rp <?= number_format(
-$total
-); ?>
-</h3>
+                                Rp <?= number_format(
+                                        $cart['harga']
+                                    ); ?>
 
-<a
-href="checkout.php?total=<?= $total ?>"
-class="btn btn-success">
+                            </td>
 
-Checkout
+                            <td>
 
-</a>
+                                <?= $cart['qty']; ?>
 
-</div>
+                            </td>
+
+                            <td>
+
+                                Rp <?= number_format(
+                                        $subtotal
+                                    ); ?>
+
+                            </td>
+
+                            <td>
+
+                                <a
+                                    href="cart.php?delete=<?= $cart['cart_id'] ?>"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Hapus buku dari keranjang?')">
+
+                                    Hapus
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endwhile; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="text-end mt-4">
+
+        <h4 class="fw-bold">
+
+            Total:
+            <span class="text-primary">
+
+                Rp <?= number_format(
+                        $total
+                    ); ?>
+
+            </span>
+
+        </h4>
+
+        <?php if ($total > 0) : ?>
+
+            <a
+                href="checkout.php"
+                class="btn btn-success px-4">
+
+                Checkout
+
+            </a>
+
+        <?php endif; ?>
+
+    </div>
 
 </div>
 

@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['user'])){
+if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit;
 }
@@ -22,17 +22,17 @@ $queryCart = mysqli_query(
 
 $total = 0;
 
-while($row = mysqli_fetch_assoc($queryCart)){
+while ($row = mysqli_fetch_assoc($queryCart)) {
 
     $subtotal =
-    $row['harga']
-    *
-    $row['qty'];
+        $row['harga']
+        *
+        $row['qty'];
 
     $total += $subtotal;
 }
 
-if(isset($_POST['checkout'])){
+if (isset($_POST['checkout'])) {
 
     $alamat = mysqli_real_escape_string(
         $conn,
@@ -55,11 +55,11 @@ if(isset($_POST['checkout'])){
         )"
     );
 
-    if($saveTransaction){
+    if ($saveTransaction) {
 
         // ambil id transaksi terakhir
         $transaksi_id =
-        mysqli_insert_id($conn);
+            mysqli_insert_id($conn);
 
         // ambil isi cart user
         $cartQuery = mysqli_query(
@@ -71,17 +71,18 @@ if(isset($_POST['checkout'])){
             WHERE cart.user_id = '$user_id'"
         );
 
-        while($item =
-        mysqli_fetch_assoc($cartQuery)){
+        while ($item =
+            mysqli_fetch_assoc($cartQuery)
+        ) {
 
             $buku_id =
-            $item['buku_id'];
+                $item['buku_id'];
 
             $qty =
-            $item['qty'];
+                $item['qty'];
 
             $harga =
-            $item['harga'];
+                $item['harga'];
 
             // simpan detail transaksi
             mysqli_query(
@@ -118,45 +119,45 @@ if(isset($_POST['checkout'])){
 
 <div class="container py-5">
 
-<div class="col-md-7 mx-auto">
+    <div class="col-md-7 mx-auto">
 
-<div class="card shadow p-4">
+        <div class="card shadow p-4">
 
-<h2 class="mb-4">
-Payment at Delivery
-</h2>
+            <h2 class="mb-4">
+                Payment at Delivery
+            </h2>
 
-<h4 class="mb-4">
-Total:
-<span class="text-primary">
-Rp <?= number_format($total) ?>
-</span>
-</h4>
+            <h4 class="mb-4">
+                Total:
+                <span class="text-primary">
+                    Rp <?= number_format($total) ?>
+                </span>
+            </h4>
 
-<form method="POST">
+            <form method="POST">
 
-<label class="mb-2">
-Alamat Pengiriman
-</label>
+                <label class="mb-2">
+                    Alamat Pengiriman
+                </label>
 
-<textarea
-name="alamat"
-rows="5"
-class="form-control mb-4"
-required></textarea>
+                <textarea
+                    name="alamat"
+                    rows="5"
+                    class="form-control mb-4"
+                    required></textarea>
 
-<button
-name="checkout"
-class="btn btn-success w-100">
+                <button
+                    name="checkout"
+                    class="btn btn-success w-100">
 
-Pesan Sekarang
+                    Pesan Sekarang
 
-</button>
+                </button>
 
-</form>
+            </form>
 
-</div>
-</div>
+        </div>
+    </div>
 </div>
 
 <?php include 'includes/footer.php'; ?>

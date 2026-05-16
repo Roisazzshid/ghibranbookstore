@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['admin'])){
+if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
     exit;
 }
@@ -19,7 +19,7 @@ $query = mysqli_query(
     ORDER BY transaksi.id DESC"
 );
 
-if(isset($_POST['update_status'])){
+if (isset($_POST['update_status'])) {
 
     $id = $_POST['id'];
     $status = $_POST['status'];
@@ -38,141 +38,144 @@ if(isset($_POST['update_status'])){
 
 <!DOCTYPE html>
 <html>
-<head>
-<title>List Pesanan</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
+<head>
+    <title>List Pesanan</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 </head>
 
 <body class="bg-light">
 
-<div class="container py-5">
+    <div class="container py-5">
 
-<h2>List Pesanan</h2>
+        <h2>List Pesanan</h2>
 
-<a href="index.php"
-class="btn btn-secondary mb-3">
-Kembali
-</a>
+        <a href="index.php"
+            class="btn btn-secondary mb-3">
+            Kembali
+        </a>
 
-<table class="table table-bordered bg-white">
+        <table class="table table-bordered bg-white">
 
-<thead class="table-dark">
+            <thead class="table-dark">
 
-<tr>
-<th>ID</th>
-<th>User</th>
-<th>Total</th>
-<th>Status</th>
-<th>Tanggal</th>
-<th>Aksi</th>
-</tr>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Tanggal</th>
+                    <th>Aksi</th>
+                </tr>
 
-</thead>
+            </thead>
 
-<tbody>
+            <tbody>
 
-<?php while($order =
-mysqli_fetch_assoc($query)) : ?>
+                <?php while ($order =
+                    mysqli_fetch_assoc($query)
+                ) : ?>
 
-<tr>
+                    <tr>
 
-<td><?= $order['id'] ?></td>
+                        <td><?= $order['id'] ?></td>
 
-<td><?= $order['fullname'] ?></td>
+                        <td><?= $order['fullname'] ?></td>
 
-<td>
-Rp <?= number_format(
-$order['total']
-) ?>
-</td>
+                        <td>
+                            Rp <?= number_format(
+                                    $order['total']
+                                ) ?>
+                        </td>
 
-<td>
+                        <td>
 
-<form method="POST">
+                            <form method="POST">
 
-<input
-type="hidden"
-name="id"
-value="<?= $order['id'] ?>">
+                                <input
+                                    type="hidden"
+                                    name="id"
+                                    value="<?= $order['id'] ?>">
 
-<select
-name="status"
-class="form-select">
+                                <select
+                                    name="status"
+                                    class="form-select">
 
-<option
-<?= $order['status']
-== 'Diproses'
-? 'selected' : '' ?>>
+                                    <option
+                                        <?= $order['status']
+                                            == 'Diproses'
+                                            ? 'selected' : '' ?>>
 
-Diproses
+                                        Diproses
 
-</option>
+                                    </option>
 
-<option
-<?= $order['status']
-== 'Dikemas'
-? 'selected' : '' ?>>
+                                    <option
+                                        <?= $order['status']
+                                            == 'Dikemas'
+                                            ? 'selected' : '' ?>>
 
-Dikemas
+                                        Dikemas
 
-</option>
+                                    </option>
 
-<option
-<?= $order['status']
-== 'Dikirim'
-? 'selected' : '' ?>>
+                                    <option
+                                        <?= $order['status']
+                                            == 'Dikirim'
+                                            ? 'selected' : '' ?>>
 
-Dikirim
+                                        Dikirim
 
-</option>
+                                    </option>
 
-<option
-<?= $order['status']
-== 'Selesai'
-? 'selected' : '' ?>>
+                                    <option
+                                        <?= $order['status']
+                                            == 'Selesai'
+                                            ? 'selected' : '' ?>>
 
-Selesai
+                                        Selesai
 
-</option>
+                                    </option>
 
-</select>
+                                </select>
 
-<button
-name="update_status"
-class="btn btn-sm btn-primary mt-2">
+                                <button
+                                    name="update_status"
+                                    class="btn btn-sm btn-primary mt-2">
 
-Update
+                                    Update
 
-</button>
+                                </button>
 
-</form>
+                            </form>
 
-</td>
+                        </td>
 
-<td><?= $order['created_at'] ?></td>
+                        <td><?= $order['created_at'] ?></td>
 
-<td>
+                        <td>
 
-<a
-href="order-detail.php?id=<?= $order['id'] ?>"
-class="btn btn-sm btn-primary">
+                            <a
+                                href="order-detail.php?id=<?= $order['id'] ?>"
+                                class="btn btn-sm btn-primary">
 
-Detail
+                                Detail
 
-</a>
+                            </a>
 
-</td>
+                        </td>
 
-</tr>
+                    </tr>
 
-<?php endwhile; ?>
+                <?php endwhile; ?>
 
-</tbody>
+            </tbody>
 
-</table>
+        </table>
 
-</div>
+    </div>
 </body>
+
 </html>

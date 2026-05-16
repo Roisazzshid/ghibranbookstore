@@ -3,7 +3,7 @@
 session_start();
 include 'config/database.php';
 
-if(isset($_POST['send'])){
+if (isset($_POST['send'])) {
 
     $nama = htmlspecialchars($_POST['nama']);
     $email = htmlspecialchars($_POST['email']);
@@ -21,7 +21,7 @@ if(isset($_POST['send'])){
     );
 
     $success =
-    "Pesan berhasil dikirim";
+        "Pesan berhasil dikirim";
 }
 ?>
 
@@ -30,55 +30,55 @@ if(isset($_POST['send'])){
 
 <div class="container py-5">
 
-<div class="col-md-7 mx-auto">
+    <div class="col-md-7 mx-auto">
 
-<div class="card shadow p-4">
+        <div class="card shadow p-4">
 
-<h2 class="mb-4">
-Hubungi Admin
-</h2>
+            <h2 class="mb-4">
+                Hubungi Admin
+            </h2>
 
-<?php
-if(isset($success)){
-echo "<div class='alert alert-success'>$success</div>";
-}
-?>
+            <?php
+            if (isset($success)) {
+                echo "<div class='alert alert-success'>$success</div>";
+            }
+            ?>
 
-<form method="POST">
+            <form method="POST">
 
-<input
-type="text"
-name="nama"
-class="form-control mb-3"
-placeholder="Nama"
-required>
+                <input
+                    type="text"
+                    name="nama"
+                    class="form-control mb-3"
+                    placeholder="Nama"
+                    required>
 
-<input
-type="email"
-name="email"
-class="form-control mb-3"
-placeholder="Email"
-required>
+                <input
+                    type="email"
+                    name="email"
+                    class="form-control mb-3"
+                    placeholder="Email"
+                    required>
 
-<textarea
-name="pesan"
-class="form-control mb-3"
-rows="5"
-placeholder="Pesan"
-required></textarea>
+                <textarea
+                    name="pesan"
+                    class="form-control mb-3"
+                    rows="5"
+                    placeholder="Pesan"
+                    required></textarea>
 
-<button
-name="send"
-class="btn btn-primary">
+                <button
+                    name="send"
+                    class="btn btn-primary">
 
-Kirim Pesan
+                    Kirim Pesan
 
-</button>
+                </button>
 
-</form>
+            </form>
 
-</div>
-</div>
+        </div>
+    </div>
 </div>
 
 <?php include 'includes/footer.php'; ?>

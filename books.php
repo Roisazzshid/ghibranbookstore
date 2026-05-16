@@ -4,7 +4,7 @@ include 'config/database.php';
 
 $search = '';
 
-if(isset($_GET['search'])){
+if (isset($_GET['search'])) {
     $search = $_GET['search'];
 }
 
@@ -37,14 +37,14 @@ $query = mysqli_query(
         <div class="input-group shadow-sm">
 
             <input
-            type="text"
-            name="search"
-            class="form-control"
-            placeholder="Cari buku..."
-            value="<?= $search ?>">
+                type="text"
+                name="search"
+                class="form-control"
+                placeholder="Cari buku..."
+                value="<?= $search ?>">
 
             <button
-            class="btn btn-primary">
+                class="btn btn-primary">
 
                 Cari
 
@@ -57,50 +57,50 @@ $query = mysqli_query(
     <!-- Card Buku -->
     <div class="row g-4">
 
-        <?php while($book = mysqli_fetch_assoc($query)) : ?>
+        <?php while ($book = mysqli_fetch_assoc($query)) : ?>
 
-        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="col-lg-3 col-md-4 col-sm-6">
 
-            <div class="card shadow-sm h-100 border-0">
+                <div class="card shadow-sm h-100 border-0">
 
-                <img
-                src="<?= !empty($book['gambar'])
-                ? 'uploads/' . $book['gambar']
-                : 'https://placehold.co/300x400'; ?>"
-                class="card-img-top"
-                style="height:300px; object-fit:cover;">
+                    <img
+                        src="<?= !empty($book['gambar'])
+                                    ? 'uploads/' . $book['gambar']
+                                    : 'https://placehold.co/300x400'; ?>"
+                        class="card-img-top"
+                        style="height:300px; object-fit:cover;">
 
-                <div class="card-body d-flex flex-column">
+                    <div class="card-body d-flex flex-column">
 
-                    <span class="badge bg-primary mb-2">
-                        <?= $book['nama_kategori']; ?>
-                    </span>
+                        <span class="badge bg-primary mb-2">
+                            <?= $book['nama_kategori']; ?>
+                        </span>
 
-                    <h5 class="fw-bold">
-                        <?= $book['judul']; ?>
-                    </h5>
+                        <h5 class="fw-bold">
+                            <?= $book['judul']; ?>
+                        </h5>
 
-                    <p class="text-muted mb-2">
-                        <?= $book['penulis']; ?>
-                    </p>
+                        <p class="text-muted mb-2">
+                            <?= $book['penulis']; ?>
+                        </p>
 
-                    <h6 class="fw-bold text-primary mb-3">
-                        Rp <?= number_format($book['harga']); ?>
-                    </h6>
+                        <h6 class="fw-bold text-primary mb-3">
+                            Rp <?= number_format($book['harga']); ?>
+                        </h6>
 
-                    <a
-                    href="detail-book.php?id=<?= $book['id']; ?>"
-                    class="btn btn-primary mt-auto w-100">
+                        <a
+                            href="detail-book.php?id=<?= $book['id']; ?>"
+                            class="btn btn-primary mt-auto w-100">
 
-                        Lihat Detail
+                            Lihat Detail
 
-                    </a>
+                        </a>
+
+                    </div>
 
                 </div>
 
             </div>
-
-        </div>
 
         <?php endwhile; ?>
 

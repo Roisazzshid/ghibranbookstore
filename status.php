@@ -4,16 +4,16 @@ session_start();
 include 'config/database.php';
 
 $user_id =
-$_SESSION['user']['id'];
+    $_SESSION['user']['id'];
 
 $query =
-mysqli_query(
-$conn,
-"SELECT * FROM transaksi
+    mysqli_query(
+        $conn,
+        "SELECT * FROM transaksi
 WHERE user_id=
 '$user_id'
 ORDER BY id DESC"
-);
+    );
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -21,61 +21,62 @@ ORDER BY id DESC"
 
 <div class="container py-5">
 
-<h2 class="mb-4">
-Status Pengiriman
-</h2>
+    <h2 class="mb-4">
+        Status Pengiriman
+    </h2>
 
-<div class="card shadow-sm">
+    <div class="card shadow-sm">
 
-<table class="table">
+        <table class="table">
 
-<thead>
-<tr>
-<th>ID</th>
-<th>Total</th>
-<th>Status</th>
-<th>Tanggal</th>
-</tr>
-</thead>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Tanggal</th>
+                </tr>
+            </thead>
 
-<tbody>
+            <tbody>
 
-<?php while($row =
-mysqli_fetch_assoc($query)) : ?>
+                <?php while ($row =
+                    mysqli_fetch_assoc($query)
+                ) : ?>
 
-<tr>
+                    <tr>
 
-<td>
-#<?= $row['id'] ?>
-</td>
+                        <td>
+                            #<?= $row['id'] ?>
+                        </td>
 
-<td>
-Rp <?= number_format(
-$row['total']
-) ?>
-</td>
+                        <td>
+                            Rp <?= number_format(
+                                    $row['total']
+                                ) ?>
+                        </td>
 
-<td>
+                        <td>
 
-<span class="badge bg-primary">
-<?= $row['status'] ?>
-</span>
+                            <span class="badge bg-primary">
+                                <?= $row['status'] ?>
+                            </span>
 
-</td>
+                        </td>
 
-<td>
-<?= $row['created_at'] ?>
-</td>
+                        <td>
+                            <?= $row['created_at'] ?>
+                        </td>
 
-</tr>
+                    </tr>
 
-<?php endwhile; ?>
+                <?php endwhile; ?>
 
-</tbody>
+            </tbody>
 
-</table>
+        </table>
 
-</div>
+    </div>
 
 </div>
 

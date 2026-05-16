@@ -26,10 +26,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE email='$email'"
     );
 
-    if(mysqli_num_rows($checkEmail) > 0){
+    if (mysqli_num_rows($checkEmail) > 0) {
 
         $error = "Email sudah terdaftar!";
-
     } else {
 
         $hashPassword = password_hash(
@@ -50,11 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             )"
         );
 
-        if($insert){
+        if ($insert) {
 
             header("Location: login.php");
             exit;
-
         } else {
 
             $error = "Registrasi gagal!";
@@ -74,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 Register
             </h2>
 
-            <?php if($error != '') : ?>
+            <?php if ($error != '') : ?>
                 <div class="alert alert-danger">
                     <?= $error ?>
                 </div>
