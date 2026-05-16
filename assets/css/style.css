@@ -1,0 +1,38 @@
+body {
+    background: #f8fafc;
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    border-bottom: 1px solid #eee;
+}
+
+.navbar-brand {
+    color: #1e3a8a !important;
+}
+
+.btn-primary {
+    background: #1e40af;
+    border: none;
+}
+
+.btn-primary:hover {
+    opacity: .9;
+}
+
+.hero-section {
+    background: linear-gradient(
+    135deg,
+    #ffffff,
+    #eff6ff
+    );
+    border-radius: 20px;
+}
+
+.card {
+    border-radius: 18px;
+}
+
+footer {
+    background: white;
+}
