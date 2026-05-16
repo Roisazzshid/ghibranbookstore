@@ -8,6 +8,7 @@ if(!isset($_SESSION['admin'])){
 
 include '../config/database.php';
 
+/* CREATE */
 if(isset($_POST['add'])){
 
     $kategori = mysqli_real_escape_string(
@@ -18,9 +19,9 @@ if(isset($_POST['add'])){
     mysqli_query(
         $conn,
         "INSERT INTO kategori(
-        nama_kategori
+            nama_kategori
         ) VALUES(
-        '$kategori'
+            '$kategori'
         )"
     );
 
@@ -28,9 +29,48 @@ if(isset($_POST['add'])){
     exit;
 }
 
+/* DELETE */
+if(isset($_GET['delete'])){
+
+    $id = $_GET['delete'];
+
+    mysqli_query(
+        $conn,
+        "DELETE FROM kategori
+        WHERE id='$id'"
+    );
+
+    header("Location: categories.php");
+    exit;
+}
+
+/* UPDATE */
+if(isset($_POST['update'])){
+
+    $id = $_POST['id'];
+
+    $kategori =
+    mysqli_real_escape_string(
+        $conn,
+        $_POST['kategori']
+    );
+
+    mysqli_query(
+        $conn,
+        "UPDATE kategori
+        SET nama_kategori='$kategori'
+        WHERE id='$id'"
+    );
+
+    header("Location: categories.php");
+    exit;
+}
+
+/* DATA */
 $query = mysqli_query(
     $conn,
-    "SELECT * FROM kategori
+    "SELECT *
+    FROM kategori
     ORDER BY id DESC"
 );
 ?>
@@ -38,130 +78,258 @@ $query = mysqli_query(
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>Kategori Buku</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 rel="stylesheet">
+
 </head>
 
 <body class="bg-light">
 
 <div class="container py-5">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-<h2>Kategori Buku</h2>
+        <h2 class="fw-bold">
+            Kategori Buku
+        </h2>
 
-<div>
-<a href="index.php"
-class="btn btn-secondary">
-Dashboard
-</a>
+        <div>
 
-<button
-class="btn btn-primary"
-data-bs-toggle="modal"
-data-bs-target="#addModal">
+            <a
+            href="index.php"
+            class="btn btn-secondary">
 
-+ Tambah Kategori
+                Dashboard
 
-</button>
-</div>
+            </a>
 
-</div>
+            <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addModal">
 
-<div class="card shadow-sm border-0">
+                + Tambah Kategori
 
-<div class="table-responsive">
+            </button>
 
-<table class="table table-hover align-middle mb-0">
+        </div>
 
-<thead class="table-dark">
-<tr>
-<th>ID</th>
-<th>Nama Kategori</th>
-</tr>
-</thead>
+    </div>
 
-<tbody>
+    <div class="card shadow-sm border-0">
 
-<?php while($row = mysqli_fetch_assoc($query)) : ?>
+        <div class="table-responsive">
 
-<tr>
-<td><?= $row['id'] ?></td>
-<td><?= $row['nama_kategori'] ?></td>
-</tr>
+            <table class="table table-hover align-middle mb-0">
 
-<?php endwhile; ?>
+                <thead class="table-dark">
 
-</tbody>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Kategori</th>
+                        <th width="180">
+                            Aksi
+                        </th>
+                    </tr>
 
-</table>
+                </thead>
 
-</div>
-</div>
+                <tbody>
+
+                <?php while($row = mysqli_fetch_assoc($query)) : ?>
+
+                <tr>
+
+                    <td>
+                        <?= $row['id'] ?>
+                    </td>
+
+                    <td>
+                        <?= $row['nama_kategori'] ?>
+                    </td>
+
+                    <td>
+
+                        <button
+                        class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#edit<?= $row['id'] ?>">
+
+                            Edit
+
+                        </button>
+
+                        <a
+                        href="categories.php?delete=<?= $row['id'] ?>"
+                        class="btn btn-danger btn-sm"
+                        onclick="return confirm('Yakin hapus kategori?')">
+
+                            Hapus
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                <!-- Modal Edit -->
+                <div
+                class="modal fade"
+                id="edit<?= $row['id'] ?>">
+
+                    <div class="modal-dialog">
+
+                        <div class="modal-content">
+
+                            <form method="POST">
+
+                                <div class="modal-header">
+
+                                    <h5>
+                                        Edit Kategori
+                                    </h5>
+
+                                    <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal">
+                                    </button>
+
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <input
+                                    type="hidden"
+                                    name="id"
+                                    value="<?= $row['id'] ?>">
+
+                                    <label class="mb-2">
+                                        Nama Kategori
+                                    </label>
+
+                                    <input
+                                    type="text"
+                                    name="kategori"
+                                    class="form-control"
+                                    value="<?= $row['nama_kategori'] ?>"
+                                    required>
+
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+
+                                        Batal
+
+                                    </button>
+
+                                    <button
+                                    type="submit"
+                                    name="update"
+                                    class="btn btn-primary">
+
+                                        Update
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <?php endwhile; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
 
 <!-- Modal Tambah -->
-<div class="modal fade"
+<div
+class="modal fade"
 id="addModal">
 
-<div class="modal-dialog">
+    <div class="modal-dialog">
 
-<div class="modal-content">
+        <div class="modal-content">
 
-<div class="modal-header">
-<h5>Tambah Kategori</h5>
+            <form method="POST">
 
-<button
-class="btn-close"
-data-bs-dismiss="modal">
-</button>
-</div>
+                <div class="modal-header">
 
-<form method="POST">
+                    <h5>
+                        Tambah Kategori
+                    </h5>
 
-<div class="modal-body">
+                    <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                    </button>
 
-<label class="mb-2">
-Nama Kategori
-</label>
+                </div>
 
-<input
-type="text"
-name="kategori"
-class="form-control"
-required>
+                <div class="modal-body">
 
-</div>
+                    <label class="mb-2">
+                        Nama Kategori
+                    </label>
 
-<div class="modal-footer">
+                    <input
+                    type="text"
+                    name="kategori"
+                    class="form-control"
+                    required>
 
-<button
-type="button"
-class="btn btn-secondary"
-data-bs-dismiss="modal">
+                </div>
 
-Batal
+                <div class="modal-footer">
 
-</button>
+                    <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
 
-<button
-type="submit"
-name="add"
-class="btn btn-primary">
+                        Batal
 
-Simpan
+                    </button>
 
-</button>
+                    <button
+                    type="submit"
+                    name="add"
+                    class="btn btn-primary">
 
-</div>
+                        Simpan
 
-</form>
+                    </button>
 
-</div>
-</div>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -8,31 +8,32 @@ if(!isset($_SESSION['admin'])){
 
 include '../config/database.php';
 
+/* CREATE */
 if(isset($_POST['add'])){
 
-    $judul = $_POST['judul'];
-    $penulis = $_POST['penulis'];
+    $judul = mysqli_real_escape_string($conn,$_POST['judul']);
+    $penulis = mysqli_real_escape_string($conn,$_POST['penulis']);
     $harga = $_POST['harga'];
     $stok = $_POST['stok'];
     $kategori = $_POST['kategori'];
-    $deskripsi = $_POST['deskripsi'];
+    $deskripsi = mysqli_real_escape_string($conn,$_POST['deskripsi']);
 
     mysqli_query(
         $conn,
         "INSERT INTO buku(
-        kategori_id,
-        judul,
-        penulis,
-        harga,
-        stok,
-        deskripsi
+            kategori_id,
+            judul,
+            penulis,
+            harga,
+            stok,
+            deskripsi
         ) VALUES(
-        '$kategori',
-        '$judul',
-        '$penulis',
-        '$harga',
-        '$stok',
-        '$deskripsi'
+            '$kategori',
+            '$judul',
+            '$penulis',
+            '$harga',
+            '$stok',
+            '$deskripsi'
         )"
     );
 
@@ -40,233 +41,428 @@ if(isset($_POST['add'])){
     exit;
 }
 
+/* DELETE */
+if(isset($_GET['delete'])){
+
+    $id = $_GET['delete'];
+
+    mysqli_query(
+        $conn,
+        "DELETE FROM buku
+        WHERE id='$id'"
+    );
+
+    header("Location: books.php");
+    exit;
+}
+
+/* UPDATE */
+if(isset($_POST['update'])){
+
+    $id = $_POST['id'];
+
+    $judul = mysqli_real_escape_string($conn,$_POST['judul']);
+    $penulis = mysqli_real_escape_string($conn,$_POST['penulis']);
+    $kategori = $_POST['kategori'];
+    $harga = $_POST['harga'];
+    $stok = $_POST['stok'];
+    $deskripsi = mysqli_real_escape_string($conn,$_POST['deskripsi']);
+
+    mysqli_query(
+        $conn,
+        "UPDATE buku SET
+        kategori_id='$kategori',
+        judul='$judul',
+        penulis='$penulis',
+        harga='$harga',
+        stok='$stok',
+        deskripsi='$deskripsi'
+        WHERE id='$id'"
+    );
+
+    header("Location: books.php");
+    exit;
+}
+
+/* DATA BUKU */
 $query = mysqli_query(
     $conn,
-    "SELECT buku.*,
-    kategori.nama_kategori
+    "SELECT buku.*, kategori.nama_kategori
     FROM buku
     LEFT JOIN kategori
-    ON buku.kategori_id =
-    kategori.id
+    ON buku.kategori_id = kategori.id
     ORDER BY buku.id DESC"
 );
 
-$kategori = mysqli_query(
+/* DATA KATEGORI */
+$kategoriQuery = mysqli_query(
     $conn,
     "SELECT * FROM kategori"
 );
+
+$kategoriData = [];
+while($kat = mysqli_fetch_assoc($kategoriQuery)){
+    $kategoriData[] = $kat;
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>Data Buku</title>
+    <title>Data Buku</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-rel="stylesheet">
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
 </head>
 
 <body class="bg-light">
 
 <div class="container py-5">
 
-<div class="d-flex justify-content-between mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-<h2>Data Buku</h2>
+        <h2 class="fw-bold">
+            Data Buku
+        </h2>
 
-<div>
+        <div>
 
-<a href="index.php"
-class="btn btn-secondary">
-Dashboard
-</a>
+            <a href="index.php"
+            class="btn btn-secondary">
+                Dashboard
+            </a>
 
-<button
-class="btn btn-primary"
-data-bs-toggle="modal"
-data-bs-target="#bookModal">
+            <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#bookModal">
 
-+ Tambah Buku
+                + Tambah Buku
 
-</button>
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Penulis</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                        <th width="180">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                <?php while($book = mysqli_fetch_assoc($query)) : ?>
+
+                <tr>
+
+                    <td><?= $book['id'] ?></td>
+                    <td><?= $book['judul'] ?></td>
+                    <td><?= $book['penulis'] ?></td>
+                    <td><?= $book['nama_kategori'] ?></td>
+                    <td>Rp <?= number_format($book['harga']) ?></td>
+                    <td><?= $book['stok'] ?></td>
+
+                    <td>
+
+                        <button
+                        class="btn btn-warning btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#edit<?= $book['id'] ?>">
+
+                            Edit
+
+                        </button>
+
+                        <a
+                        href="books.php?delete=<?= $book['id'] ?>"
+                        class="btn btn-danger btn-sm"
+                        onclick="return confirm('Yakin hapus buku?')">
+
+                            Delete
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                <!-- Modal Edit -->
+                <div class="modal fade"
+                id="edit<?= $book['id'] ?>">
+
+                    <div class="modal-dialog modal-lg">
+
+                        <div class="modal-content">
+
+                            <form method="POST">
+
+                                <div class="modal-header">
+                                    <h5>Edit Buku</h5>
+
+                                    <button
+                                    class="btn-close"
+                                    data-bs-dismiss="modal">
+                                    </button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <input
+                                    type="hidden"
+                                    name="id"
+                                    value="<?= $book['id'] ?>">
+
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-3">
+                                            <label>Judul</label>
+
+                                            <input
+                                            type="text"
+                                            name="judul"
+                                            class="form-control"
+                                            value="<?= $book['judul'] ?>"
+                                            required>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label>Penulis</label>
+
+                                            <input
+                                            type="text"
+                                            name="penulis"
+                                            class="form-control"
+                                            value="<?= $book['penulis'] ?>"
+                                            required>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label>Kategori</label>
+
+                                            <select
+                                            name="kategori"
+                                            class="form-control"
+                                            required>
+
+                                                <?php foreach($kategoriData as $kat) : ?>
+
+                                                <option
+                                                value="<?= $kat['id'] ?>"
+                                                <?= $kat['id'] == $book['kategori_id']
+                                                ? 'selected' : '' ?>>
+
+                                                    <?= $kat['nama_kategori'] ?>
+
+                                                </option>
+
+                                                <?php endforeach; ?>
+
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-3 mb-3">
+                                            <label>Harga</label>
+
+                                            <input
+                                            type="number"
+                                            name="harga"
+                                            class="form-control"
+                                            value="<?= $book['harga'] ?>"
+                                            required>
+                                        </div>
+
+                                        <div class="col-md-3 mb-3">
+                                            <label>Stok</label>
+
+                                            <input
+                                            type="number"
+                                            name="stok"
+                                            class="form-control"
+                                            value="<?= $book['stok'] ?>"
+                                            required>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label>Deskripsi</label>
+
+                                            <textarea
+                                            name="deskripsi"
+                                            class="form-control"
+                                            rows="4"><?= $book['deskripsi'] ?></textarea>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button
+                                    type="submit"
+                                    name="update"
+                                    class="btn btn-primary">
+
+                                        Update Buku
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <?php endwhile; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
 
-</div>
+<!-- Modal Tambah Buku -->
+<div class="modal fade" id="bookModal">
 
-<div class="card shadow-sm border-0">
+    <div class="modal-dialog modal-lg">
 
-<div class="table-responsive">
+        <div class="modal-content">
 
-<table class="table table-hover align-middle mb-0">
+            <form method="POST">
 
-<thead class="table-dark">
+                <div class="modal-header">
+                    <h5>Tambah Buku</h5>
 
-<tr>
-<th>ID</th>
-<th>Judul</th>
-<th>Penulis</th>
-<th>Kategori</th>
-<th>Harga</th>
-<th>Stok</th>
-</tr>
+                    <button
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                    </button>
+                </div>
 
-</thead>
+                <div class="modal-body">
 
-<tbody>
+                    <div class="row">
 
-<?php while($book =
-mysqli_fetch_assoc($query)) : ?>
+                        <div class="col-md-6 mb-3">
+                            <label>Judul</label>
 
-<tr>
+                            <input
+                            type="text"
+                            name="judul"
+                            class="form-control"
+                            required>
+                        </div>
 
-<td><?= $book['id'] ?></td>
-<td><?= $book['judul'] ?></td>
-<td><?= $book['penulis'] ?></td>
-<td><?= $book['nama_kategori'] ?></td>
-<td>Rp <?= number_format($book['harga']) ?></td>
-<td><?= $book['stok'] ?></td>
+                        <div class="col-md-6 mb-3">
+                            <label>Penulis</label>
 
-</tr>
+                            <input
+                            type="text"
+                            name="penulis"
+                            class="form-control"
+                            required>
+                        </div>
 
-<?php endwhile; ?>
+                        <div class="col-md-6 mb-3">
+                            <label>Kategori</label>
 
-</tbody>
+                            <select
+                            name="kategori"
+                            class="form-control"
+                            required>
 
-</table>
+                                <option value="">
+                                    Pilih Kategori
+                                </option>
 
-</div>
-</div>
+                                <?php foreach($kategoriData as $kat) : ?>
 
-</div>
+                                <option
+                                value="<?= $kat['id'] ?>">
 
-<!-- Modal Buku -->
-<div class="modal fade"
-id="bookModal">
+                                    <?= $kat['nama_kategori'] ?>
 
-<div class="modal-dialog modal-lg">
+                                </option>
 
-<div class="modal-content">
+                                <?php endforeach; ?>
 
-<div class="modal-header">
+                            </select>
+                        </div>
 
-<h5>Tambah Buku</h5>
+                        <div class="col-md-3 mb-3">
+                            <label>Harga</label>
 
-<button
-class="btn-close"
-data-bs-dismiss="modal">
-</button>
+                            <input
+                            type="number"
+                            name="harga"
+                            class="form-control"
+                            required>
+                        </div>
 
-</div>
+                        <div class="col-md-3 mb-3">
+                            <label>Stok</label>
 
-<form method="POST">
+                            <input
+                            type="number"
+                            name="stok"
+                            class="form-control"
+                            required>
+                        </div>
 
-<div class="modal-body">
+                        <div class="col-12">
+                            <label>Deskripsi</label>
 
-<div class="row">
+                            <textarea
+                            name="deskripsi"
+                            rows="4"
+                            class="form-control"></textarea>
+                        </div>
 
-<div class="col-md-6 mb-3">
-<label>Judul Buku</label>
-<input type="text"
-name="judul"
-class="form-control"
-required>
-</div>
+                    </div>
 
-<div class="col-md-6 mb-3">
-<label>Penulis</label>
-<input type="text"
-name="penulis"
-class="form-control"
-required>
-</div>
+                </div>
 
-<div class="col-md-6 mb-3">
-<label>Kategori</label>
+                <div class="modal-footer">
 
-<select
-name="kategori"
-class="form-control"
-required>
+                    <button
+                    type="submit"
+                    name="add"
+                    class="btn btn-primary">
 
-<option value="">
-Pilih kategori
-</option>
+                        Simpan Buku
 
-<?php
-mysqli_data_seek($kategori,0);
-while($kat=
-mysqli_fetch_assoc($kategori)) :
-?>
+                    </button>
 
-<option
-value="<?= $kat['id'] ?>">
-<?= $kat['nama_kategori'] ?>
-</option>
+                </div>
 
-<?php endwhile; ?>
+            </form>
 
-</select>
-</div>
+        </div>
 
-<div class="col-md-3 mb-3">
-<label>Harga</label>
-<input type="number"
-name="harga"
-class="form-control"
-required>
-</div>
+    </div>
 
-<div class="col-md-3 mb-3">
-<label>Stok</label>
-<input type="number"
-name="stok"
-class="form-control"
-required>
-</div>
-
-<div class="col-12">
-
-<label>Deskripsi</label>
-
-<textarea
-name="deskripsi"
-rows="4"
-class="form-control">
-</textarea>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="modal-footer">
-
-<button
-type="button"
-class="btn btn-secondary"
-data-bs-dismiss="modal">
-
-Batal
-
-</button>
-
-<button
-type="submit"
-name="add"
-class="btn btn-primary">
-
-Simpan Buku
-
-</button>
-
-</div>
-
-</form>
-
-</div>
-</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
